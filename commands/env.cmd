@@ -41,6 +41,15 @@ if [[ ${WARDEN_ENV_TYPE} == "magento2" ]]; then
     WARDEN_VARNISH=${WARDEN_VARNISH:-1}
     WARDEN_ELASTICSEARCH=${WARDEN_ELASTICSEARCH:-1}
     WARDEN_RABBITMQ=${WARDEN_RABBITMQ:-1}
+
+    ## configure db type ##
+    if [[ ${MYSQL_VERSION} != '' ]]
+        DB_TYPE='mysql'
+        DB_VERSION=${MYSQL_VERSION}
+    else
+        DB_TYPE='mariadb'
+        DB_VERSION=${MARIADB_VERSION}
+    fi 
 fi
 
 ## WSL1/WSL2 are GNU/Linux env type but still run Docker Desktop
