@@ -47,10 +47,16 @@ fi
 if [[ ${MYSQL_VERSION} != 0 ]]; then
     export DB_TYPE="mysql"
     export DB_VERSION="${MYSQL_VERSION}"
+    echo $DB_TYPE
+    echo $DB_VERSION
 elif [[ ${MARIADB_VERSION} != 0 ]]; then
     export DB_TYPE="mariadb"
     export DB_VERSION="${MARIADB_VERSION}"
+    echo $DB_TYPE
+    echo $DB_VERSION
 fi 
+echo $DB_TYPE
+echo $DB_VERSION
 
 ## WSL1/WSL2 are GNU/Linux env type but still run Docker Desktop
 if [[ ${XDEBUG_CONNECT_BACK_HOST} == '' ]] && grep -sqi microsoft /proc/sys/kernel/osrelease; then
