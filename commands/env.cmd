@@ -43,7 +43,7 @@ if [[ ${WARDEN_ENV_TYPE} == "magento2" ]]; then
     WARDEN_RABBITMQ=${WARDEN_RABBITMQ:-1}
 
     ## configure db type ##
-    if [[ ${MYSQL_VERSION} != '' ]]
+    if [[ ${MYSQL_VERSION} != '' ]]; then
         DB_TYPE='mysql'
         DB_VERSION=${MYSQL_VERSION}
     else
