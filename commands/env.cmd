@@ -43,10 +43,10 @@ if [[ ${WARDEN_ENV_TYPE} == "magento2" ]]; then
     WARDEN_RABBITMQ=${WARDEN_RABBITMQ:-1}
 
     ## configure db type ##
-    if [[ ${MYSQL_VERSION} > 0 ]]; then
+    if [[ ${MYSQL_VERSION:-0} != 0 ]]; then
         export DB_TYPE="mysql"
         export DB_VERSION=${MYSQL_VERSION}
-    elif [[ ${MARIADB_VERSION} > 0 ]]; then
+    elif [[ ${MARIADB_VERSION:-0} != 0 ]]; then
         export DB_TYPE="mariadb"
         export DB_VERSION=${MARIADB_VERSION}
     fi 
