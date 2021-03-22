@@ -46,8 +46,9 @@ fi
 ## configure db type ##
 if [[ ${MYSQL_VERSION} != 0 ]]; then
     export DB_TYPE="mysql"
-    export DB_VERSION="${MYSQL_VERSION}"
+    export DB_VERSION=${MYSQL_VERSION}
     echo $DB_TYPE
+    echo $MYSQL_VERSION
     echo $DB_VERSION
 elif [[ ${MARIADB_VERSION} != 0 ]]; then
     export DB_TYPE="mariadb"
