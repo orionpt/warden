@@ -45,10 +45,10 @@ if [[ ${WARDEN_ENV_TYPE} == "magento2" ]]; then
     ## configure db type ##
     if [[ ${MYSQL_VERSION} != '' && ${DB_TYPE} == 'mysql' ]]; then
         DB_TYPE='mysql'
-        DB_VERSION=${MYSQL_VERSION}
+        export DB_VERSION=${MYSQL_VERSION}
     elif [[ ${MARIADB_VERSION} != '' && ${DB_TYPE} == 'mariadb' ]]; then
         DB_TYPE='mariadb'
-        DB_VERSION=${MARIADB_VERSION}
+        export DB_VERSION=${MARIADB_VERSION}
     fi 
 fi
 
