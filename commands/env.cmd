@@ -46,10 +46,10 @@ fi
 ## configure db type ##
 if [[ ${MYSQL_VERSION} != 0 ]]; then
     export DB_TYPE="mysql"
-    export DB_VERSION=${MYSQL_VERSION}
+    export DB_VERSION="${MYSQL_VERSION}"
 elif [[ ${MARIADB_VERSION} != 0 ]]; then
-    export DB_TYPE="outra"
-    export DB_VERSION=${MARIADB_VERSION}
+    export DB_TYPE="mariadb"
+    export DB_VERSION="${MARIADB_VERSION}"
 fi 
 
 ## WSL1/WSL2 are GNU/Linux env type but still run Docker Desktop
