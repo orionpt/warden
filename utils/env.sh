@@ -56,6 +56,12 @@ function loadEnvConfig () {
     assertValidEnvType
 }
 
+function loadDbConfig () {
+    local WARDEN_ENV_PATH="${1}"
+    eval "$(grep "^MYSQL_VERSION" "${WARDEN_ENV_PATH}/.env")"
+    eval "$(grep "^MARIADB_VERSION" "${WARDEN_ENV_PATH}/.env")"
+}
+
 function renderEnvNetworkName() {
     echo "${WARDEN_ENV_NAME}_default" | tr '[:upper:]' '[:lower:]'
 }
