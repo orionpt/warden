@@ -41,16 +41,16 @@ if [[ ${WARDEN_ENV_TYPE} == "magento2" ]]; then
     WARDEN_VARNISH=${WARDEN_VARNISH:-1}
     WARDEN_ELASTICSEARCH=${WARDEN_ELASTICSEARCH:-1}
     WARDEN_RABBITMQ=${WARDEN_RABBITMQ:-1}
-
-    ## configure db type ##
-    if [[ ${MYSQL_VERSION:-0} != 0 ]]; then
-        export DB_TYPE="mysql"
-        export DB_VERSION=${MYSQL_VERSION}
-    elif [[ ${MARIADB_VERSION:-0} != 0 ]]; then
-        export DB_TYPE="mariadb"
-        export DB_VERSION=${MARIADB_VERSION}
-    fi 
 fi
+
+## configure db type ##
+if [[ ${MYSQL_VERSION} != 0 ]]; then
+    export DB_TYPE="mysql"
+    export DB_VERSION=${MYSQL_VERSION}
+elif [[ ${MARIADB_VERSION} != 0 ]]; then
+    export DB_TYPE="outra"
+    export DB_VERSION=${MARIADB_VERSION}
+fi 
 
 ## WSL1/WSL2 are GNU/Linux env type but still run Docker Desktop
 if [[ ${XDEBUG_CONNECT_BACK_HOST} == '' ]] && grep -sqi microsoft /proc/sys/kernel/osrelease; then
