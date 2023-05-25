@@ -15,6 +15,7 @@ fi
 
 ## load connection information for the mysql service
 DB_CONTAINER=$($WARDEN_BIN env ps -q db)
+DB_CONTAINER=orionpt/mysql:8.0.33-1.0
 if [[ ! ${DB_CONTAINER} ]]; then
     fatal "No container found for db service."
 fi
