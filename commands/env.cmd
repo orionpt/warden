@@ -35,6 +35,7 @@ fi
 if [[ ${WARDEN_ENV_TYPE} != local ]]; then
     WARDEN_NGINX=${WARDEN_NGINX:-1}
     WARDEN_DB=${WARDEN_DB:-1}
+    WARDEN_DBBLOG=${WARDEN_DBBLOG:-1}
     WARDEN_REDIS=${WARDEN_REDIS:-1}
 
     # define bash history folder for changing permissions
@@ -76,6 +77,9 @@ fi
 
 [[ ${WARDEN_DB} -eq 1 ]] \
     && appendEnvPartialIfExists "db"
+    
+[[ ${WARDEN_DBBLOG} -eq 1 ]] \
+    && appendEnvPartialIfExists "dbblog"
 
 [[ ${WARDEN_ELASTICSEARCH} -eq 1 ]] \
     && appendEnvPartialIfExists "elasticsearch"
