@@ -7,7 +7,6 @@ services:
   dbblog:
     hostname: "${WARDEN_ENV_NAME}-mariadb"
     image: ${WARDEN_IMAGE_REPOSITORY}/${MYSQL_DISTRIBUTION:-mariadb}:${MYSQL_DISTRIBUTION_VERSION:-${MARIADB_VERSION:-10.4}}
-#    image: orionpt/mysql:8.0.33-1.0
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-app}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-app}
