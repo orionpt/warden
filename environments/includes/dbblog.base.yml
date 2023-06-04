@@ -8,15 +8,15 @@ services:
     hostname: "${WARDEN_ENV_NAME}-mariadb"
     image: ${WARDEN_IMAGE_REPOSITORY}/${MYSQL_DISTRIBUTION:-mariadb}:${MYSQL_DISTRIBUTION_VERSION:-${MARIADB_VERSION:-10.4}}
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-app}
-      - MYSQL_DATABASE=${MYSQL_DATABASE:-app}
-      - MYSQL_USER=${MYSQL_USER:-app}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-app}
+      - MYSQL_ROOT_PASSWORD=${MYSQLBLOG_ROOT_PASSWORD:-app}
+      - MYSQL_DATABASE=${MYSQLBLOG_DATABASE:-app}
+      - MYSQL_USER=${MYSQLBLOG_USER:-app}
+      - MYSQL_PASSWORD=${MYSQLBLOG_PASSWORD:-app}
       - MYSQL_HISTFILE=/sql_history/.sql_history
     volumes:
-      - dbdata:/var/lib/mysql
-      - sqlhistory:/sql_history
+      - dbblogdata:/var/lib/mysql
+      - blogsqlhistory:/sql_history
 
 volumes:
-  dbdata:
-  sqlhistory:
+  dbblogdata:
+  blogsqlhistory:
