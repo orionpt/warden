@@ -5,7 +5,7 @@ services:
       - dbblog
 
   dbblog:
-    hostname: "${WARDEN_ENV_NAME}-mariadb"
+    hostname: "${WARDEN_ENV_NAME}-mariadbblog"
     image: ${WARDEN_IMAGE_REPOSITORY}/${MYSQL_DISTRIBUTION:-mariadb}:${MYSQL_DISTRIBUTION_VERSION:-${MARIADB_VERSION:-10.4}}
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQLBLOG_ROOT_PASSWORD:-app}
