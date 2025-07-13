@@ -5,6 +5,11 @@ WARDEN_ENV_PATH="$(locateEnvPath)" || exit $?
 loadEnvConfig "${WARDEN_ENV_PATH}" || exit $?
 assertDockerRunning
 
+## warn if global services are not running
+if [[ "${WARDEN_PARAMS[0]}" == "up" ]]; then
+    assertSvcRunning
+fi
+
 HOST_UID=$(id -u)
 HOST_GID=$(id -g)
 
@@ -56,6 +61,8 @@ if [[ ${WARDEN_ENV_TYPE} == "magento2" ]]; then
     WARDEN_VARNISH=${WARDEN_VARNISH:-1}
     WARDEN_ELASTICSEARCH=${WARDEN_ELASTICSEARCH:-1}
     WARDEN_RABBITMQ=${WARDEN_RABBITMQ:-1}
+    WARDEN_MAGENTO2_GRAPHQL_SERVER=${WARDEN_MAGENTO2_GRAPHQL_SERVER:-0}
+    WARDEN_MAGENTO2_GRAPHQL_SERVER_DEBUG=${WARDEN_MAGENTO2_GRAPHQL_SERVER_DEBUG:-0}
 fi
 
 ## WSL1/WSL2 are GNU/Linux env type but still run Docker Desktop
@@ -104,6 +111,9 @@ fi
 [[ ${WARDEN_REDIS} -eq 1 ]] \
     && appendEnvPartialIfExists "redis"
 
+[[ ${WARDEN_VALKEY:=0} -eq 1 ]] \
+    && appendEnvPartialIfExists "valkey"
+
 appendEnvPartialIfExists "${WARDEN_ENV_TYPE}"
 
 [[ ${WARDEN_TEST_DB} -eq 1 ]] \
@@ -129,6 +139,14 @@ fi
 [[ ${WARDEN_MAGEPACK} -eq 1 ]] \
     && appendEnvPartialIfExists "${WARDEN_ENV_TYPE}.magepack"
 
+[[ ${WARDEN_MAGENTO2_GRAPHQL_SERVER} -eq 1 ]] \
+    && appendEnvPartialIfExists "${WARDEN_ENV_TYPE}.graphql"
+[[ ${WARDEN_MAGENTO2_GRAPHQL_SERVER_DEBUG} -eq 1 ]] \
+    && appendEnvPartialIfExists "${WARDEN_ENV_TYPE}.graphql-debug"
+
+[[ ${WARDEN_PHP_SPX} -eq 1 ]] \
+    && appendEnvPartialIfExists "php-spx"
+
 if [[ -f "${WARDEN_ENV_PATH}/.warden/warden-env.yml" ]]; then
     DOCKER_COMPOSE_ARGS+=("-f")
     DOCKER_COMPOSE_ARGS+=("${WARDEN_ENV_PATH}/.warden/warden-env.yml")
@@ -148,6 +166,9 @@ fi
 ## disconnect peered service containers from environment network
 if [[ "${WARDEN_PARAMS[0]}" == "down" ]]; then
     disconnectPeeredServices "$(renderEnvNetworkName)"
+
+    ## regenerate PMA config on each env changing
+    regeneratePMAConfig
 fi
 
 ## connect peered service containers to environment network
@@ -167,6 +188,9 @@ if [[ "${WARDEN_PARAMS[0]}" == "up" ]]; then
         WARDEN_PARAMS=("${WARDEN_PARAMS[@]:1}")
         WARDEN_PARAMS=(up -d "${WARDEN_PARAMS[@]}")
     fi
+
+    ## regenerate PMA config on each env changing
+    regeneratePMAConfig
 fi
 
 ## lookup address of traefik container on environment network
@@ -178,7 +202,7 @@ TRAEFIK_ADDRESS="$(docker container inspect traefik \
 )"
 export TRAEFIK_ADDRESS;
 
-if [[ $OSTYPE =~ ^darwin ]]; then
+if [[ ${WARDEN_MUTAGEN_ENABLE} -eq 1 ]]; then
     export MUTAGEN_SYNC_FILE="${WARDEN_DIR}/environments/${WARDEN_ENV_TYPE}/${WARDEN_ENV_TYPE}.mutagen.yml"
 
     if [[ -f "${WARDEN_HOME_DIR}/environments/${WARDEN_ENV_TYPE}/${WARDEN_ENV_TYPE}.mutagen.yml" ]]; then
@@ -196,7 +220,7 @@ fi
 
 ## pause mutagen sync if needed
 if [[ "${WARDEN_PARAMS[0]}" == "stop" ]] \
-    && [[ $OSTYPE =~ ^darwin ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]]
+    && [[ ${WARDEN_MUTAGEN_ENABLE} -eq 1 ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]]
 then
     $WARDEN_BIN sync pause
 fi
@@ -206,9 +230,15 @@ ${DOCKER_COMPOSE_COMMAND} \
     --project-directory "${WARDEN_ENV_PATH}" -p "${WARDEN_ENV_NAME}" \
     "${DOCKER_COMPOSE_ARGS[@]}" "${WARDEN_PARAMS[@]}" "$@"
 
+
+if [[ "${WARDEN_PARAMS[0]}" == "stop" || "${WARDEN_PARAMS[0]}" == "down" || \
+      "${WARDEN_PARAMS[0]}" == "up" || "${WARDEN_PARAMS[0]}" == "start" ]]; then
+    regeneratePMAConfig
+fi
+
 ## resume mutagen sync if available and php-fpm container id hasn't changed
 if { [[ "${WARDEN_PARAMS[0]}" == "up" ]] || [[ "${WARDEN_PARAMS[0]}" == "start" ]]; } \
-    && [[ $OSTYPE =~ ^darwin ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]] \
+    && [[ ${WARDEN_MUTAGEN_ENABLE} -eq 1 ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]] \
     && [[ $($WARDEN_BIN sync list | grep -ci 'Status: \[Paused\]' | awk '{print $1}') == "1" ]] \
     && [[ $($WARDEN_BIN env ps -q php-fpm) ]] \
     && [[ $(docker container inspect "$($WARDEN_BIN env ps -q php-fpm)" --format '{{ .State.Status }}') = "running" ]] \
@@ -217,11 +247,11 @@ then
     $WARDEN_BIN sync resume
 fi
 
-if [[ $OSTYPE =~ ^darwin ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]] # If we're using Mutagen
+if [[ ${WARDEN_MUTAGEN_ENABLE} -eq 1 ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]] # If we're using Mutagen
 then
   MUTAGEN_VERSION=$(mutagen version)
   CONNECTION_STATE_STRING='Connected state: Connected'
-  if [[ $(version "${MUTAGEN_VERSION}") -ge $(version '0.15.0') ]]; then
+  if [[ $((10#$(version "${MUTAGEN_VERSION}"))) -ge $((10#$(version '0.15.0'))) ]]; then
     CONNECTION_STATE_STRING='Connected: Yes'
   fi
 
@@ -237,7 +267,7 @@ fi
 
 ## stop mutagen sync if needed
 if [[ "${WARDEN_PARAMS[0]}" == "down" ]] \
-    && [[ $OSTYPE =~ ^darwin ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]]
+    && [[ ${WARDEN_MUTAGEN_ENABLE} -eq 1 ]] && [[ -f "${MUTAGEN_SYNC_FILE}" ]]
 then
     $WARDEN_BIN sync stop
 fi
