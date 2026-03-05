@@ -95,7 +95,7 @@ if [[ ! -f "${WARDEN_HOME_DIR}/.env" ]]; then
 		WARDEN_DNSMASQ_ENABLE=1
 		# Set to "0" to disable phpMyAdmin
 		WARDEN_PHPMYADMIN_ENABLE=1
-		# Set to "1" to enable Mutagen
-		WARDEN_MUTAGEN_ENABLE=1
+		# Set to "0" to disabled Mutagen.  Keep commented out to use System default (Darwin defaults to 1)
+		# WARDEN_MUTAGEN_ENABLE=0
 	EOT
 fi

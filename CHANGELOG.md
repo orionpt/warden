@@ -1,7 +1,12 @@
 # Change Log
 
 ## UNRELEASED
-[All Commits](https://github.com/wardenenv/warden/compare/0.15.0..main)
+[All Commits](https://github.com/wardenenv/warden/compare/0.16.0..main)
+
+**Bug Fixes:**
+* Add support to dynamically connect peered services based on enabled status ([#892](https://github.com/wardenenv/warden/issues/892) by @bap14, [#919](https://github.com/wardenenv/warden/issues/919) by @xinsodev)
+
+## Version [0.16.0](https://github.com/wardenenv/warden/tree/0.16.0) (2026-02-12)
 
 **Big Changes:**
 * PHP SPX support ([#820](https://github.com/wardenenv/warden/pull/820) by @SamJUK)
@@ -10,14 +15,18 @@
   This support should be considered experimental.  Your Adobe Commerce application should already be setup and configured
   before turning on the GraphQL Application Flag.  You can enable GraphQL with the flag `WARDEN_MAGENTO2_GRAPHQL_SERVER=1`
   or run it using a debug PHP image by including the additional flag `WARDEN_MAGENTO2_GRAPHQL_SERVER_DEBUG=1`
+* Added top level Warden debug information command `warden doctor` by @hardyjohnson
 
 **Enhancements:**
 * Add ability to run vite bundler in warden for Laravel. See: [Laravel + Vite](https://docs.warden.dev/environments/laravel.html) ([#846](https://github.com/wardenenv/warden/issues/846) by @bap14)
 * Added Valkey service ([#861](https://github.com/wardenenv/warden#861) by @navarr)
+* Added `warden db upgrade` command ([#895](https://github.com/wardenenv/warden/pull/895) by @workslop8264)
 
 **Bug Fixes:**
 * System-level SSL certificates are no longer overwritten ([#812](https://github.com/wardenenv/warden/pull/812) by @SamJUK)
 * Portainer service domain default fix ([#837] by @hardyjohnson credit to: @manuelcanepa)
+* Fix for Traefik configuration being overwritten in Warden home directory when running `warden svc up` command ([#876] by @hardyjohnson).
+* Updated default Traefik version to 2.11 (from 2.2) to fix compatibility with newer Docker versions ([#896] by @mattijv)
 
 ## Version [0.15.0](https://github.com/wardenenv/warden/tree/0.15.0) (2024-11-04)
 
