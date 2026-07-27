@@ -71,6 +71,12 @@ function loadEnvConfig () {
     loadEnvFile "${WARDEN_ENV_PATH}/.env" "TRAEFIK_"
     loadEnvFile "${WARDEN_ENV_PATH}/.env" "PHP_"
 
+    ## values in .env.local (typically git-ignored) override those in .env,
+    ## allowing per-clone settings such as a distinct WARDEN_ENV_NAME
+    loadEnvFile "${WARDEN_ENV_PATH}/.env.local" "WARDEN_"
+    loadEnvFile "${WARDEN_ENV_PATH}/.env.local" "TRAEFIK_"
+    loadEnvFile "${WARDEN_ENV_PATH}/.env.local" "PHP_"
+
     WARDEN_ENV_NAME="${WARDEN_ENV_NAME:-}"
     WARDEN_ENV_TYPE="${WARDEN_ENV_TYPE:-}"
     WARDEN_ENV_SUBT=""
